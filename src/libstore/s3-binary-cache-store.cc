@@ -25,6 +25,8 @@
 #include <aws/s3/model/PutObjectRequest.h>
 #include <aws/transfer/TransferManager.h>
 
+#include <string>
+
 using namespace Aws::Transfer;
 
 namespace nix {
@@ -125,8 +127,34 @@ ref<Aws::Client::ClientConfiguration> S3Helper::makeConfig(const string & region
     if (!endpoint.empty()) {
         res->endpointOverride = endpoint;
     }
-    res->requestTimeoutMs = 600 * 1000;
-    res->connectTimeoutMs = 5 * 1000;
+
+    long requestTimeoutMs = 600 * 1000;
+    long connectTimeoutMs = 5 * 1000;
+
+    auto requestTimeoutMsStr = getEnv("S3_BINARY_CACHE_REQUEST_TIMEOUT_MS");
+    try {
+        requestTimeoutMs = std::stol(requestTimeoutMsStr, nullptr, 10);
+    } catch (std::invalid_argument & e) {
+        std::cout << "Invalid value for S3_BINARY_CACHE_REQUEST_TIMEOUT_MS:";
+        std::cout << requestTimeoutMsStr << std::endl;
+    } catch (std::out_of_range & e) {
+        std::cout << "S3_BINARY_CACHE_REQUEST_TIMEOUT_MS out of range:";
+        std::cout << requestTimeoutMsStr << std::endl;
+    }
+
+    auto connectTimeoutMsStr = getEnv("S3_BINARY_CACHE_CONNECT_TIMEOUT_MS");
+    try {
+        connectTimeoutMs = std::stol(connectTimeoutMsStr, nullptr, 10);
+    } catch (std::invalid_argument & e) {
+        std::cout << "Invalid value for S3_BINARY_CACHE_CONNECT_TIMEOUT_MS:";
+        std::cout << connectTimeoutMsStr << std::endl;
+    } catch (std::out_of_range & e) {
+        std::cout << "S3_BINARY_CACHE_CONNECT_TIMEOUT_MS out of range:";
+        std::cout << connectTimeoutMsStr << std::endl;
+    }
+
+    res->requestTimeoutMs = requestTimeoutMs;
+    res->connectTimeoutMs = connectTimeoutMs;
     res->retryStrategy = std::make_shared<RetryStrategy>();
     res->caFile = settings.caFile;
     return res;
