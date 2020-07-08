@@ -159,6 +159,9 @@ ref<Aws::Client::ClientConfiguration> S3Helper::makeConfig(const string & region
         }
     }
 
+    debug("s3 requestTimeoutMs: %ld", requestTimeoutMs);
+    debug("s3 connectTimeoutMs: %ld", connectTimeoutMs);
+
     res->requestTimeoutMs = requestTimeoutMs;
     res->connectTimeoutMs = connectTimeoutMs;
     res->retryStrategy = std::make_shared<RetryStrategy>();
