@@ -132,25 +132,31 @@ ref<Aws::Client::ClientConfiguration> S3Helper::makeConfig(const string & region
     long connectTimeoutMs = 5 * 1000;
 
     auto requestTimeoutMsStr = getEnv("S3_BINARY_CACHE_REQUEST_TIMEOUT_MS");
-    try {
-        requestTimeoutMs = std::stol(requestTimeoutMsStr, nullptr, 10);
-    } catch (std::invalid_argument & e) {
-        std::cout << "Invalid value for S3_BINARY_CACHE_REQUEST_TIMEOUT_MS:";
-        std::cout << requestTimeoutMsStr << std::endl;
-    } catch (std::out_of_range & e) {
-        std::cout << "S3_BINARY_CACHE_REQUEST_TIMEOUT_MS out of range:";
-        std::cout << requestTimeoutMsStr << std::endl;
+
+    if (!requestTimeoutMsStr.empty()) {
+        try {
+            requestTimeoutMs = std::stol(requestTimeoutMsStr, nullptr, 10);
+        } catch (std::invalid_argument & e) {
+            std::cerr << "Invalid value for S3_BINARY_CACHE_REQUEST_TIMEOUT_MS:";
+            std::cerr << requestTimeoutMsStr << std::endl;
+        } catch (std::out_of_range & e) {
+            std::cerr << "S3_BINARY_CACHE_REQUEST_TIMEOUT_MS out of range:";
+            std::cerr << requestTimeoutMsStr << std::endl;
+        }
     }
 
     auto connectTimeoutMsStr = getEnv("S3_BINARY_CACHE_CONNECT_TIMEOUT_MS");
-    try {
-        connectTimeoutMs = std::stol(connectTimeoutMsStr, nullptr, 10);
-    } catch (std::invalid_argument & e) {
-        std::cout << "Invalid value for S3_BINARY_CACHE_CONNECT_TIMEOUT_MS:";
-        std::cout << connectTimeoutMsStr << std::endl;
-    } catch (std::out_of_range & e) {
-        std::cout << "S3_BINARY_CACHE_CONNECT_TIMEOUT_MS out of range:";
-        std::cout << connectTimeoutMsStr << std::endl;
+
+    if (!connectTimeoutMsStr.empty()) {
+        try {
+            connectTimeoutMs = std::stol(connectTimeoutMsStr, nullptr, 10);
+        } catch (std::invalid_argument & e) {
+            std::cerr << "Invalid value for S3_BINARY_CACHE_CONNECT_TIMEOUT_MS:";
+            std::cerr << connectTimeoutMsStr << std::endl;
+        } catch (std::out_of_range & e) {
+            std::cerr << "S3_BINARY_CACHE_CONNECT_TIMEOUT_MS out of range:";
+            std::cerr << connectTimeoutMsStr << std::endl;
+        }
     }
 
     res->requestTimeoutMs = requestTimeoutMs;
